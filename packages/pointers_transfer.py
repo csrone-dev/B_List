@@ -181,5 +181,4 @@ def transfer_numbers(get_pointers: list):
         elif gri_pointers[temp] == '419-01':
             gri_pointers[temp] = '419-1'
         gri_pointers[temp] = gri_pointers[temp].strip()
-        print(gri_pointers[temp])
     return gri_pointers

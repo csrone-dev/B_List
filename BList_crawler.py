@@ -7,6 +7,7 @@ import fitz
 import datetime
 import threading
 import csv
+import warnings
 
 from tkinter import filedialog
 from tkinter import messagebox
@@ -16,6 +17,8 @@ from tkinter import ttk
 
 from packages.Exception_handling import get_exception
 from packages.pointers_transfer import transfer_numbers
+
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 class GRIPointers_B:
     def __init__(self, csr_report_path: str, gri_pointers_csv_name: str):
@@ -85,7 +88,6 @@ class GRIPointers_B:
 
             # 抓到每篇CSR報告附錄的GRI指標對照表
             if page.search_for('GRI') or page.search_for("指標") or page.search_for("揭露") or page.search_for("附錄"):
-                print(page)
                 self.__fill_into_single_csv(current_company_number, page)
 
         #抓到已揭露指標的數目
@@ -101,48 +103,69 @@ class GRIPointers_B:
         
     def __fill_into_single_csv(self, current_company_number, page):
         #Using normal expression to filter words caught.
+        
+        gri_words = page.get_text("text")
+        if(self.judge_special_icon(gri_words)):
+            self.csv_file.at[current_company_number, "special_icon"] = "1"
+        else:
+            self.csv_file.at[current_company_number, "special_icon"] = "0"
+        
         gri_pointers_disclosed_in_this_page = self.__gri_text_filter(re.findall(self.pattern, page.get_text("text")))
         gri_pointers_disclosed_in_this_page = transfer_numbers(gri_pointers_disclosed_in_this_page)
         
-        print(gri_pointers_disclosed_in_this_page)
-        
         for column in self.csv_file.columns:
             #處理是否揭露的判斷式
-            if (column in gri_pointers_disclosed_in_this_page):
+            if(column in gri_pointers_disclosed_in_this_page):
                 self.csv_file.at[current_company_number, column] = 1
-            
-            if self.judge_special_icon(gri_pointers_disclosed_in_this_page):
-                self.csv_file.at[current_company_number, column] = 1
-                
                 
         for column in self.csv_file.columns:
             #處理是否揭露的判斷式
-            if self.csv_file.at[current_company_number, column] == '':
+            if(self.csv_file.at[current_company_number, column] == ''):
                 self.csv_file.at[current_company_number, column] = 0
                 
     def throw_pdf(self):
         today = datetime.date.today()
         with open(f'.\\csv_file\\{today}_gri_pointers_b.csv', 'r', encoding="utf-8") as result:
-            reader = csv.DictReader(result)
-            filtered_rows = [row for row in reader if row['unreveal_num'] == "136"]
+            result_list = list(csv.DictReader(result))
+            
+            special = [row for row in result_list if row.get('special_icon') == "1"]
+            reveal = [row for row in result_list if row.get('unreveal_num') == "136"]
+            merged_rows = self.__merge_unique_dicts(reveal, special)
             
             
         with open(f'.\\csv_file\\{today}_throw_list.csv', 'w', newline='') as throw:
-            fieldnames = ['corporate_name']
+            fieldnames = ['報告書名稱', '丟出原因']
             writer = csv.DictWriter(throw, fieldnames=fieldnames)
             writer.writeheader()
             
-            for row in filtered_rows:
-                writer.writerow({'corporate_name': row['corporate_name']})
+            for row in merged_rows:
+                if(row.get('special_icon') == "1" and row.get('unreveal_num') == "136"):
+                    writer.writerow({'報告書名稱': row['corporate_name'], '丟出原因': 'GRI表格含特殊符號，GRI格式錯誤或無法識別文字'})
+                elif(row.get('special_icon') == "1"):
+                    writer.writerow({'報告書名稱': row['corporate_name'], '丟出原因': 'GRI表格含特殊符號'})
+                elif(row.get('unreveal_num') == "136"):
+                    writer.writerow({'報告書名稱': row['corporate_name'], '丟出原因': 'GRI格式錯誤或無法識別文字'})
+                
                 
     def judge_special_icon(self, disclosed_pointer):
         if ("N/A" in disclosed_pointer):
             return True
         
+        if ("NA" in disclosed_pointer):
+            return True
+        
         if ("√" in disclosed_pointer):
             return True
         
-            
+        if ("◯" in disclosed_pointer):
+            return True
+        
+        if ("●" in disclosed_pointer):
+            return True
+        
+        return False
+        
+         
     ###########################################################################
     #basic functions
                 
@@ -174,8 +197,8 @@ class GRIPointers_B:
         return not is_hyphen
     
     def __fill_in_each_reports_reveal_and_unreveal_numbers(self, current_company_number):
-        self.csv_file.iat[current_company_number, -2] = self.reveal_number
-        self.csv_file.iat[current_company_number, -1] = 136 - self.reveal_number
+        self.csv_file.iat[current_company_number, -3] = self.reveal_number
+        self.csv_file.iat[current_company_number, -2] = 136 - self.reveal_number
         
     def __fill_corporate_name(self, file, current_company_number):
         self.csv_file.iat[current_company_number, 0] = file
@@ -281,6 +304,16 @@ class GRIPointers_B:
                 del_list.append(splited_text[temp])
         return del_list
     
+    def __merge_unique_dicts(self, list1, list2):
+        merged = list1 + list2
+        unique = []
+        
+        for d in merged:
+            if d not in unique:
+                unique.append(d)
+                
+        return unique
+    
     def __get_numbers_part_from_gri_plain_text(self, splited_text):
         del_list = self.__get_non_numbers_part_from_gri_plain_text(splited_text=splited_text)
         gri_pointers = set([i for i in splited_text if i not in del_list])
@@ -341,7 +374,6 @@ def execute():
         b_sheets_process.throw_pdf()
 
     processing_csr()
-    print("Hello")
     progressbar["value"] = 99
     
     progressbar.stop()
