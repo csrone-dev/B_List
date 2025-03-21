@@ -91,7 +91,7 @@ class GRIPointers_B:
                 self.__fill_into_single_csv(current_company_number, page)
 
         #抓到已揭露指標的數目
-        for temp in range(1, 136):
+        for temp in range(1, 137):
             if self.csv_file.iat[current_company_number, temp] == 1:
                 self.reveal_number += 1
             else:
@@ -129,7 +129,7 @@ class GRIPointers_B:
             result_list = list(csv.DictReader(result))
             
             special = [row for row in result_list if row.get('special_icon') == "1"]
-            reveal = [row for row in result_list if row.get('unreveal_num') == "136"]
+            reveal = [row for row in result_list if row.get('unreveal_num') == "137"]
             merged_rows = self.__merge_unique_dicts(reveal, special)
             
             
@@ -139,18 +139,15 @@ class GRIPointers_B:
             writer.writeheader()
             
             for row in merged_rows:
-                if(row.get('special_icon') == "1" and row.get('unreveal_num') == "136"):
+                if(row.get('special_icon') == "1" and row.get('unreveal_num') == "137"):
                     writer.writerow({'報告書名稱': row['corporate_name'], '丟出原因': 'GRI表格含特殊符號，GRI格式錯誤或無法識別文字'})
                 elif(row.get('special_icon') == "1"):
                     writer.writerow({'報告書名稱': row['corporate_name'], '丟出原因': 'GRI表格含特殊符號'})
-                elif(row.get('unreveal_num') == "136"):
+                elif(row.get('unreveal_num') == "137"):
                     writer.writerow({'報告書名稱': row['corporate_name'], '丟出原因': 'GRI格式錯誤或無法識別文字'})
                 
                 
     def judge_special_icon(self, disclosed_pointer):
-        if ("N/A" in disclosed_pointer):
-            return True
-        
         if ("NA" in disclosed_pointer):
             return True
         
@@ -198,7 +195,7 @@ class GRIPointers_B:
     
     def __fill_in_each_reports_reveal_and_unreveal_numbers(self, current_company_number):
         self.csv_file.iat[current_company_number, -3] = self.reveal_number
-        self.csv_file.iat[current_company_number, -2] = 136 - self.reveal_number
+        self.csv_file.iat[current_company_number, -2] = 137 - self.reveal_number
         
     def __fill_corporate_name(self, file, current_company_number):
         self.csv_file.iat[current_company_number, 0] = file
@@ -348,8 +345,8 @@ progressbar.pack()
 progressbar.place(x=25,y=70)
 
 def progressbar_start():
-    if progressbar["value"] < progressbar["maximum"]:    # 小於最大值持續增量
-        progressbar["value"] += 1               # 進度增量 1
+    if progressbar["value"] < progressbar["maximum"]:    
+        progressbar["value"] += 1              
 
 def open_file():
     directory = filedialog.askdirectory(title="選擇CSR報告存放位置")
@@ -366,7 +363,7 @@ def execute():
     button_import["state"] = "disabled"
     
     def processing_csr():
-        b_sheets_process = GRIPointers_B(csr_report_path=csr_report_path.get(),gri_pointers_csv_name=".\\csv_file\\gri_pointers_b_frame")
+        b_sheets_process = GRIPointers_B(csr_report_path=csr_report_path.get(),gri_pointers_csv_name=".\\csv_file\\gri_pointers_b_frame_2024")
         b_sheets_process.set_pattern(pattern = r"[0-9-－–\s]")
         b_sheets_process.init_gri_pointers_csv_file(b_sheets_process.gri_pointers_csv_name)
         b_sheets_process.catch_gri_pointers(csr_report_path=b_sheets_process.get_csr_report_path(), search_term='GRI')

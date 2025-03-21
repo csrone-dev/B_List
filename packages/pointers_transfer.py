@@ -3,7 +3,72 @@ def transfer_numbers(get_pointers: list):
     for temp in range(len(gri_pointers)):
         if gri_pointers[temp].startswith("-"):
             gri_pointers[temp] = gri_pointers[temp][1:]
-        
+            
+        if gri_pointers[temp] == '2-1':
+            gri_pointers[temp] = ' 2-1'
+        elif gri_pointers[temp] == '2-2':
+            gri_pointers[temp] = ' 2-2'
+        elif gri_pointers[temp] == '2-3':
+            gri_pointers[temp] = ' 2-3'
+        elif gri_pointers[temp] == '2-4':
+            gri_pointers[temp] = ' 2-4'
+        elif gri_pointers[temp] == '2-5':
+            gri_pointers[temp] = ' 2-5'
+        elif gri_pointers[temp] == '2-6':
+            gri_pointers[temp] = ' 2-6'
+        elif gri_pointers[temp] == '2-7':
+            gri_pointers[temp] = ' 2-7'
+        elif gri_pointers[temp] == '2-8':
+            gri_pointers[temp] = ' 2-8'
+        elif gri_pointers[temp] == '2-9':
+            gri_pointers[temp] = ' 2-9'
+        elif gri_pointers[temp] == '2-10':
+            gri_pointers[temp] = ' 2-10'
+        elif gri_pointers[temp] == '2-11':
+            gri_pointers[temp] = ' 2-11'
+        elif gri_pointers[temp] == '2-12':
+            gri_pointers[temp] = ' 2-12'
+        elif gri_pointers[temp] == '2-13':
+            gri_pointers[temp] = ' 2-13'
+        elif gri_pointers[temp] == '2-14':
+            gri_pointers[temp] = ' 2-14'
+        elif gri_pointers[temp] == '2-15':
+            gri_pointers[temp] = ' 2-15'
+        elif gri_pointers[temp] == '2-16':
+            gri_pointers[temp] = ' 2-16'
+        elif gri_pointers[temp] == '2-17':
+            gri_pointers[temp] = ' 2-17'
+        elif gri_pointers[temp] == '2-18':
+            gri_pointers[temp] = ' 2-18'
+        elif gri_pointers[temp] == '2-19':
+            gri_pointers[temp] = ' 2-19'
+        elif gri_pointers[temp] == '2-20':
+            gri_pointers[temp] = ' 2-20'
+        elif gri_pointers[temp] == '2-21':
+            gri_pointers[temp] = ' 2-21'
+        elif gri_pointers[temp] == '2-22':
+            gri_pointers[temp] = ' 2-22'
+        elif gri_pointers[temp] == '2-23':
+            gri_pointers[temp] = ' 2-23'
+        elif gri_pointers[temp] == '2-24':
+            gri_pointers[temp] = ' 2-25'
+        elif gri_pointers[temp] == '2-26':
+            gri_pointers[temp] = ' 2-26'
+        elif gri_pointers[temp] == '2-27':
+            gri_pointers[temp] = ' 2-27'
+        elif gri_pointers[temp] == '2-28':
+            gri_pointers[temp] = ' 2-28'
+        elif gri_pointers[temp] == '2-29':
+            gri_pointers[temp] = ' 2-29'
+        elif gri_pointers[temp] == '2-30':
+            gri_pointers[temp] = ' 2-30'
+        elif gri_pointers[temp] == '3-1':
+            gri_pointers[temp] = ' 3-1'
+        elif gri_pointers[temp] == '3-2':
+            gri_pointers[temp] = ' 3-2'
+        elif gri_pointers[temp] == '3-3':
+            gri_pointers[temp] = ' 3-3'
+
         if gri_pointers[temp] == '102-01':
             gri_pointers[temp] = '102-1'
         elif gri_pointers[temp] == '102-02':
@@ -54,6 +119,14 @@ def transfer_numbers(get_pointers: list):
             gri_pointers[temp] = '205-3'
         elif gri_pointers[temp] == '206-01':
             gri_pointers[temp] = '206-1'
+        elif gri_pointers[temp] == '207-01':
+            gri_pointers[temp] = '207-1'
+        elif gri_pointers[temp] == '207-02':
+            gri_pointers[temp] = '207-2'
+        elif gri_pointers[temp] == '207-03':
+            gri_pointers[temp] = '207-3'
+        elif gri_pointers[temp] == '207-04':
+            gri_pointers[temp] = '207-4'
         elif gri_pointers[temp] == '301-01':
             gri_pointers[temp] = '301-1'
         elif gri_pointers[temp] == '301-02':
@@ -76,6 +149,10 @@ def transfer_numbers(get_pointers: list):
             gri_pointers[temp] = '303-2'
         elif gri_pointers[temp] == '303-03':
             gri_pointers[temp] = '303-3'
+        elif gri_pointers[temp] == '303-04':
+            gri_pointers[temp] = '303-4'
+        elif gri_pointers[temp] == '303-05':
+            gri_pointers[temp] = '303-5'
         elif gri_pointers[temp] == '304-01':
             gri_pointers[temp] = '304-1'
         elif gri_pointers[temp] == '304-02':
@@ -104,6 +181,8 @@ def transfer_numbers(get_pointers: list):
             gri_pointers[temp] = '306-2'
         elif gri_pointers[temp] == '306-03':
             gri_pointers[temp] = '306-3'
+        elif gri_pointers[temp] == '306-04':
+            gri_pointers[temp] = '306-4'
         elif gri_pointers[temp] == '306-05':
             gri_pointers[temp] = '306-5'
         elif gri_pointers[temp] == '307-01':
@@ -128,6 +207,16 @@ def transfer_numbers(get_pointers: list):
             gri_pointers[temp] = '403-3'
         elif gri_pointers[temp] == '403-04':
             gri_pointers[temp] = '403-4'
+        elif gri_pointers[temp] == '403-05':
+            gri_pointers[temp] = '403-5'
+        elif gri_pointers[temp] == '403-06':
+            gri_pointers[temp] = '403-6'
+        elif gri_pointers[temp] == '403-07':
+            gri_pointers[temp] = '403-7'
+        elif gri_pointers[temp] == '403-08':
+            gri_pointers[temp] = '403-8'
+        elif gri_pointers[temp] == '403-09':
+            gri_pointers[temp] = '403-9'
         elif gri_pointers[temp] == '404-01':
             gri_pointers[temp] = '404-1'
         elif gri_pointers[temp] == '404-02':
@@ -180,5 +269,5 @@ def transfer_numbers(get_pointers: list):
             gri_pointers[temp] = '418-1'
         elif gri_pointers[temp] == '419-01':
             gri_pointers[temp] = '419-1'
-        gri_pointers[temp] = gri_pointers[temp].strip()
+        #gri_pointers[temp] = gri_pointers[temp].strip()
     return gri_pointers
