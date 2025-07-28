@@ -1,10 +1,15 @@
 # B_List
 # 使用教學
-1. 執行BList_crawler.py後，會看到下圖的視窗，此時點擊選擇CSR報告位置即可選擇放有CSR報告書的資料夾。
-![image](https://github.com/CSRoneNCCU/B_List/assets/93423629/5fe20d2a-d73e-435b-a06d-2877ebc53f6c)
+1. 先到Google Cloud Platform申請一個帳號
+<img width="2559" height="1496" alt="image" src="https://github.com/user-attachments/assets/f9f33742-4e66-4ba4-a857-492c67d69957" />
+2. 在搜尋欄輸入"Cloud Vision API"並啟用
+3. 點開左側的"API和服務"->"已啟用的API和服務"->"憑證"->"建立憑證"，建立一個服務帳戶的憑證，並將權限設為擁有者
+4. 點進剛剛創好的帳號並點開"金鑰"->"新增鍵"->"新增新的金鑰"->"json"來建立憑證
+<img width="2559" height="1494" alt="image" src="https://github.com/user-attachments/assets/ebf278d1-9ac3-4ee9-b266-fbfde903658d" />
+5. 找出剛剛下載的憑證，並將它改名為"api_key"，接下來將github上的code下載下來
+6. 把api_key放到跟Readme同一層的位置，然後在終端執行pip install -r requirements.txt
+7. 執行BList_crawler.py即可使用，使用前要把報告書放在test_reports資料夾，在選擇報告書位置時直接選擇該資料夾即可，輸出的csv會放在csv_file資料夾
+<img width="588" height="255" alt="image" src="https://github.com/user-attachments/assets/02bca473-835c-41d0-b38a-ae932a848132" />
 
-2. 選擇完畢後按下輸出B表CSV，之後就可以在程式底下的csv_files資料夾中找到[日期]_gri_pointers_b與[日期]_throw_list兩個檔案，gri_pointers_b代表程式的判斷結果，throw_list為需要人工判斷的部分。
-![image](https://github.com/CSRoneNCCU/B_List/assets/93423629/ba27d8b2-ca1e-44ea-a68d-c8046157eaac)
-![image](https://github.com/CSRoneNCCU/B_List/assets/93423629/7be95313-3485-4839-bdb0-9da4df67f97c)
 
 
