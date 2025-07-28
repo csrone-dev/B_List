@@ -1,15 +1,9 @@
 import os
-import pdfminer
 import fitz
 import pandas as pd
-import sys
-import re
 import pdfplumber
-import pylint
-import traceback
 from PIL import Image
 import numpy as np
-import argparse
 from Exception_handling import get_exception
 
 

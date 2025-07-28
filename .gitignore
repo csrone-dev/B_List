@@ -1,0 +1,3 @@
+*.json
+dev_env/
+__pycache__/

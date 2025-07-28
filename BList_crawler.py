@@ -8,16 +8,22 @@ import datetime
 import threading
 import csv
 import warnings
+import io
 
 from tkinter import filedialog
 from tkinter import messagebox
 from tkinter.constants import *
 from tkinter import *
 from tkinter import ttk
+from google.cloud import vision
+from google.cloud.vision_v1 import types
+from PIL import Image
 
 from packages.Exception_handling import get_exception
 from packages.pointers_transfer import transfer_numbers
 
+KEY = 'api_key.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = KEY
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 class GRIPointers_B:
@@ -42,7 +48,7 @@ class GRIPointers_B:
         """
 
         #init the requirment for the method
-        current_company_number = 0  # to avoid the index in the first row
+        current_company_number = 0  
 
         try:
             for file in self.get_files_list():
@@ -59,67 +65,64 @@ class GRIPointers_B:
 
         except Exception as e:
             get_exception(e, file)
-            
+        
     def __fill_into_GRI_csv(self, pdf_document, file, current_company_number, search_term):
-        """
-        __fill_into_GRI_csv [summary] First initialize all the corporate name into
-        csv files, then check each GRI pointers for each corporate. If ends, then do nothing.
-        Args:
-            pdf_document ([type]): [description]
-            file ([type]): [description]
-            current_company_number ([type]): [description]
-            search_term ([type]): [description]
-        """
-
-        # First inserting all the corporates name into csv file.
         self.__fill_corporate_name(file=file, current_company_number=current_company_number)
         self.__shift_to_next_gri_pointer()
-        #從這裡開始，所有的gri_pointer都從1開始
 
-        #邏輯為，每一頁抓到Search term後，利用Regular expression存入list，一一比照dataframe的column與list內部項目
-        #若list無比對成功者，該指標填0，換到下一個指標。
-        #若list比對成功者，該指標填1
-        ##########################################
-        # Crawl into each page of current csr, if catch gri keywords then insert it into csv files
-        for current_page in range(len(pdf_document)):
+        pages_with_gri = []
+        for i in range(len(pdf_document)):
+            extracted_text = self.extract_text_with_vision(pdf_document.load_page(i))
+            if re.search(r'(GRI|指標|揭露|附錄)', extracted_text):
+                pages_with_gri.append(extracted_text)
+
+        for page_words in pages_with_gri:
             self.__reset_gri_pointer()
-            # Every page should traversal all the gri pointer
-            page = pdf_document.load_page(current_page)
+            self.__fill_into_single_csv(current_company_number, page_words)
 
-            # 抓到每篇CSR報告附錄的GRI指標對照表
-            if page.search_for('GRI') or page.search_for("指標") or page.search_for("揭露") or page.search_for("附錄"):
-                self.__fill_into_single_csv(current_company_number, page)
+        data = self.csv_file.iloc[current_company_number, 1:137].values
+        self.reveal_number = (data == 1).sum()
 
-        #抓到已揭露指標的數目
-        for temp in range(1, 137):
-            if self.csv_file.iat[current_company_number, temp] == 1:
-                self.reveal_number += 1
-            else:
-                continue
-
-        #每間公司結束之後，將該公司的揭露指標數與未揭露指標數填入dataframe
         self.__fill_in_each_reports_reveal_and_unreveal_numbers(current_company_number)
         self.reveal_number = 0
+        
+    def extract_text_with_vision(self, pdf_page: fitz.Page) -> str:
+        pix = pdf_page.get_pixmap()
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format='PNG')
+        img_bytes = img_byte_arr.getvalue()
+    
+        client = vision.ImageAnnotatorClient()
+        image = vision.Image(content=img_bytes)
+        
+        response = client.document_text_detection(image=image)
+        if response.error.message:
+            raise Exception(f"Google Vision API Error: {response.error.message}")
+
+        extracted_text = response.full_text_annotation.text
+        
+        return extracted_text
+        
         
     def __fill_into_single_csv(self, current_company_number, page):
         #Using normal expression to filter words caught.
         
-        gri_words = page.get_text("text")
+        gri_words = page
         if(self.judge_special_icon(gri_words)):
             self.csv_file.at[current_company_number, "special_icon"] = "1"
         else:
             self.csv_file.at[current_company_number, "special_icon"] = "0"
         
-        gri_pointers_disclosed_in_this_page = self.__gri_text_filter(re.findall(self.pattern, page.get_text("text")))
+        gri_pointers_disclosed_in_this_page = self.__gri_text_filter(re.findall(self.pattern, gri_words))
         gri_pointers_disclosed_in_this_page = transfer_numbers(gri_pointers_disclosed_in_this_page)
         
         for column in self.csv_file.columns:
-            #處理是否揭露的判斷式
             if(column in gri_pointers_disclosed_in_this_page):
                 self.csv_file.at[current_company_number, column] = 1
                 
         for column in self.csv_file.columns:
-            #處理是否揭露的判斷式
             if(self.csv_file.at[current_company_number, column] == ''):
                 self.csv_file.at[current_company_number, column] = 0
                 
@@ -393,15 +396,12 @@ window.protocol("WM_DELETE_WINDOW", on_closing)
 
 all_process = []
 
-# processing_thread = multiprocessing.Process(target = execute)
 processing_thread = threading.Thread(target = execute)
 processing_thread.daemon = True
 all_process.append(processing_thread)
-#設定button按鈕接受功能
 button_import = tk.Button(window, text="選擇CSR報告位置", command=open_file)
 button_import.place(x=25,y=5)
 
-#設定entry
 entry_f=tk.Text(window, height=1.3, width=35)
 entry_f.place(x=25, y=40)
 
